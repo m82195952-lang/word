@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5">
+<title>我的生词本</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo">📖</div>
+    <div class="title-wrap">
+      <h1>我的生词本</h1>
+      <p id="wordCount" class="subtitle">共 0 个单词</p>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- 添加单词 -->
+  <section class="card add-card">
+    <form id="addForm" autocomplete="off">
+      <input id="wordInput" type="text" placeholder="输入不认识的英语单词，如 serendipity" maxlength="60" autofocus>
+      <button id="addBtn" type="submit">添加</button>
+    </form>
+    <p id="hint" class="hint">添加后自动标注音标、中文释义，并支持朗读</p>
+  </section>
+
+  <!-- 预览卡片（查询结果确认） -->
+  <section id="preview" class="card preview hidden">
+    <div class="preview-head">
+      <div class="preview-word" id="previewWord"></div>
+      <span id="previewStatus" class="status-chip"></span>
+    </div>
+    <div id="previewPhonetic" class="preview-phonetic"></div>
+    <div id="previewDefs" class="preview-defs"></div>
+    <div class="preview-actions">
+      <button id="previewConfirm" class="btn primary" type="button">✓ 确认添加</button>
+      <button id="previewCancel" class="btn ghost" type="button">取消</button>
+    </div>
+  </section>
+
+  <!-- 搜索筛选 -->
+  <div class="filter-wrap">
+    <input id="filterInput" type="search" placeholder="🔍 搜索已保存的单词…">
+  </div>
+
+  <!-- 单词列表 -->
+  <section id="list" class="list"></section>
+
+  <div id="emptyState" class="empty hidden">
+    <div class="empty-icon">🗒️</div>
+    <p>还没有生词</p>
+    <p class="empty-sub">在上方输入遇到的生词，点「添加」即可保存</p>
+  </div>
+
+</main>
+
+<!-- 编辑弹窗 -->
+<div id="modalOverlay" class="overlay hidden">
+  <div class="modal card">
+    <h2 class="modal-title">编辑单词</h2>
+    <label class="field-label">单词</label>
+    <input id="editWord" type="text" maxlength="60">
+    <div class="field-row">
+      <div>
+        <label class="field-label">美式音标</label>
+        <input id="editPhoneticUs" type="text" placeholder="/həˈloʊ/">
+      </div>
+      <div>
+        <label class="field-label">英式音标</label>
+        <input id="editPhoneticUk" type="text" placeholder="/həˈləʊ/">
+      </div>
+    </div>
+    <label class="field-label">中文释义（每行一条）</label>
+    <textarea id="editDefs" rows="4" placeholder="int. 你好&#10;n. 招呼"></textarea>
+    <div class="modal-actions">
+      <button id="editSave" class="btn primary" type="button">保存</button>
+      <button id="editCancel" class="btn ghost" type="button">取消</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

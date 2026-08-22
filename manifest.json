@@ -1,0 +1,13 @@
+{
+  "name": "我的生词本",
+  "short_name": "生词本",
+  "description": "记录英语生词，自动标注音标与中文释义，支持朗读",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f1f3f8",
+  "theme_color": "#4f46e5",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
