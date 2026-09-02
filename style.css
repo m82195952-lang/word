@@ -231,6 +231,17 @@ body {
 .icon-btn.danger { background: #fde8ef; color: var(--danger); }
 .icon-btn.edit { background: #f0f3fa; color: #475569; }
 .word-date { margin-top: 6px; font-size: 11px; color: #9ca3af; }
+.word-date.loading { color: var(--accent); font-weight: 600; }
+.word-date.loading::after {
+  content: '';
+  animation: dots 1.2s steps(4, end) infinite;
+}
+@keyframes dots {
+  0% { content: ''; }
+  25% { content: '·'; }
+  50% { content: '··'; }
+  75% { content: '···'; }
+}
 
 /* 英文释义（次要信息） */
 .word-defs .def-line.en { color: #6b7280; font-size: 12.5px; }

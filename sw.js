@@ -1,5 +1,5 @@
-/* 离线缓存：首次打开后缓存应用外壳，之后可离线打开、秒开 */
-const CACHE = 'vocab-shell-v1';
+/* 离线缓存：首次打开后缓存应用外壳和离线词库，之后可离线打开、秒开、离线查词 */
+const CACHE = 'vocab-shell-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './app.js',
   './manifest.json',
   './icon.svg',
+  './dict.json',
 ];
 
 self.addEventListener('install', (e) => {
