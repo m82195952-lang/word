@@ -1,5 +1,5 @@
 /* 离线缓存：首次打开后缓存应用外壳和离线词库，之后可离线打开、秒开、离线查词 */
-const CACHE = 'vocab-shell-v2';
+const CACHE = 'vocab-shell-v3';
 const ASSETS = [
   './',
   './index.html',

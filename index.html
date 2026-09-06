@@ -33,6 +33,15 @@
     <p id="hint" class="hint">点「添加」立即保存，自动补全音标、中文释义，支持朗读</p>
   </section>
 
+  <!-- 排序 + 检测入口 -->
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="排序方式">
+      <button id="sortAlpha" class="seg-btn active" type="button">A-Z</button>
+      <button id="sortNew" class="seg-btn" type="button">最新</button>
+    </div>
+    <button id="quizBtn" class="quiz-btn" type="button">🧪 单词检测</button>
+  </div>
+
   <!-- 搜索筛选 -->
   <div class="filter-wrap">
     <input id="filterInput" type="search" placeholder="🔍 搜索已保存的单词…">
@@ -70,6 +79,40 @@
     <div class="modal-actions">
       <button id="editSave" class="btn primary" type="button">保存</button>
       <button id="editCancel" class="btn ghost" type="button">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 单词检测 -->
+<div id="quizOverlay" class="overlay quiz-overlay hidden">
+  <div class="quiz card">
+    <!-- 进行中 -->
+    <div id="quizMain">
+      <div class="quiz-top">
+        <span id="quizProgress" class="quiz-progress"></span>
+        <button id="quizClose" class="icon-btn danger" type="button" title="退出检测">✕</button>
+      </div>
+      <div class="quiz-bar"><div id="quizBarFill"></div></div>
+      <div class="quiz-body">
+        <div id="quizWord" class="quiz-word"></div>
+        <div id="quizPhonetic" class="quiz-phonetic"></div>
+        <button id="quizSpeak" class="quiz-speak" type="button">🔊 朗读</button>
+        <div id="quizDefs" class="quiz-defs hidden"></div>
+      </div>
+      <div class="quiz-actions">
+        <button id="quizShow" class="btn ghost" type="button">👁 显示释义</button>
+        <button id="quizRemember" class="btn primary" type="button">✔ 记得</button>
+      </div>
+    </div>
+    <!-- 结果 -->
+    <div id="quizResult" class="quiz-result hidden">
+      <div class="quiz-result-icon">🎉</div>
+      <h2 class="quiz-result-title">本轮完成！</h2>
+      <p id="quizResultText" class="quiz-result-text"></p>
+      <div class="quiz-result-actions">
+        <button id="quizAgain" class="btn primary" type="button">↻ 再来一轮</button>
+        <button id="quizDone" class="btn ghost" type="button">完成</button>
+      </div>
     </div>
   </div>
 </div>

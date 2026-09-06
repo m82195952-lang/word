@@ -1,4 +1,4 @@
-/* 生词本前端逻辑 v2：即点即存 + 离线词库优先 + 网络并行兜底 */
+/* 生词本前端逻辑 v3：即点即存 + 离线词库 + 排序 + 单词检测 */
 (function () {
   'use strict';
 
@@ -13,6 +13,12 @@
   let offlineDict = null;           // 离线词库 { word: { ph, zh } }
   let offlineLoading = false;
   let offlineLoaded = false;
+  let sortMode = 'alpha';           // 'alpha'(A-Z) | 'new'(最新)
+  let quizWords = null;             // 检测中抽取的单词
+  let quizIndex = 0;
+  let quizKnown = 0;                // 直接点「记得」
+  let quizReview = 0;               // 看了释义后再点「记得」
+  let quizRevealed = false;         // 当前题是否已显示释义
 
   // ---------- DOM ----------
   const $ = (id) => document.getElementById(id);
@@ -32,6 +38,24 @@
   const editSave = $('editSave');
   const editCancel = $('editCancel');
   const toastEl = $('toast');
+  const sortAlpha = $('sortAlpha');
+  const sortNew = $('sortNew');
+  const quizBtn = $('quizBtn');
+  const quizOverlay = $('quizOverlay');
+  const quizMain = $('quizMain');
+  const quizProgress = $('quizProgress');
+  const quizBarFill = $('quizBarFill');
+  const quizClose = $('quizClose');
+  const quizWord = $('quizWord');
+  const quizPhonetic = $('quizPhonetic');
+  const quizSpeak = $('quizSpeak');
+  const quizDefs = $('quizDefs');
+  const quizShow = $('quizShow');
+  const quizRemember = $('quizRemember');
+  const quizResult = $('quizResult');
+  const quizResultText = $('quizResultText');
+  const quizAgain = $('quizAgain');
+  const quizDone = $('quizDone');
 
   // ---------- 工具 ----------
   function esc(s) {
@@ -246,12 +270,19 @@
 
   function renderList() {
     const q = filterInput.value.trim().toLowerCase();
-    const shown = words.filter((w) => {
+    let shown = words.filter((w) => {
       if (!q) return true;
       return w.word.toLowerCase().includes(q) ||
         (w.definitions || []).some((d) => d.toLowerCase().includes(q)) ||
         (w.enDefs || []).some((d) => d.toLowerCase().includes(q));
     });
+    // 排序：A-Z（默认）或 最新添加
+    shown = shown.slice().sort(sortMode === 'new'
+      ? (a, b) => b.addedAt - a.addedAt
+      : (a, b) => {
+          const x = a.word.toLowerCase(), y = b.word.toLowerCase();
+          return x < y ? -1 : x > y ? 1 : 0;
+        });
 
     listEl.innerHTML = '';
     for (const w of shown) {
@@ -484,6 +515,106 @@
 
   editCancel.addEventListener('click', closeEdit);
   modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeEdit(); });
+
+  // ---------- 排序切换 ----------
+  function setSort(mode) {
+    sortMode = mode;
+    sortAlpha.classList.toggle('active', mode === 'alpha');
+    sortNew.classList.toggle('active', mode === 'new');
+    renderList();
+  }
+  sortAlpha.addEventListener('click', () => setSort('alpha'));
+  sortNew.addEventListener('click', () => setSort('new'));
+
+  // ---------- 单词检测 ----------
+  function currentQuiz() {
+    return quizWords ? quizWords[quizIndex] : null;
+  }
+
+  function startQuiz() {
+    const pool = words.slice();
+    if (!pool.length) { toast('还没有生词，先添加一些吧'); return; }
+    // Fisher-Yates 洗牌，随机抽取（最多 20 个）
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+    }
+    quizWords = pool.slice(0, 20);
+    quizIndex = 0;
+    quizKnown = 0;
+    quizReview = 0;
+    quizRevealed = false;
+    quizResult.classList.add('hidden');
+    quizMain.classList.remove('hidden');
+    quizOverlay.classList.remove('hidden');
+    renderQuiz();
+  }
+
+  function renderQuiz() {
+    const w = currentQuiz();
+    if (!w) return;
+    quizProgress.textContent = '第 ' + (quizIndex + 1) + ' / ' + quizWords.length + ' 题';
+    quizBarFill.style.width = ((quizIndex / quizWords.length) * 100) + '%';
+    quizWord.textContent = w.word;
+    const chips = phoneticChips(w);
+    quizPhonetic.innerHTML = chips.length
+      ? chips.map((l) =>
+          '<span class="ph-line">' +
+          (l.tag ? '<span class="ph-tag">' + l.tag + '</span>' : '') +
+          '<span>' + esc(l.text) + '</span>' +
+          (l.audio ? '<button class="ph-sound" data-audio="' + esc(l.audio) + '">🔊</button>' : '') +
+          '</span>').join('')
+      : '';
+    quizRevealed = false;
+    quizDefs.classList.add('hidden');
+    quizDefs.innerHTML = '';
+  }
+
+  function revealQuiz() {
+    const w = currentQuiz();
+    if (!w || quizRevealed) return;
+    quizRevealed = true;
+    const zh = (w.definitions || []).map((d) => '<div class="def-line">' + esc(d) + '</div>').join('');
+    const en = (w.enDefs || []).map((d) => '<div class="def-line en">' + esc(d) + '</div>').join('');
+    quizDefs.innerHTML = (zh + en) ||
+      '<div class="def-line">（这个词还没有释义，可在列表中点 ✎ 编辑补充）</div>';
+    quizDefs.classList.remove('hidden');
+  }
+
+  function nextQuiz() {
+    if (!quizWords) return;
+    if (quizRevealed) quizReview++; else quizKnown++;
+    quizIndex++;
+    if (quizIndex >= quizWords.length) {
+      quizMain.classList.add('hidden');
+      quizResultText.textContent =
+        '共 ' + quizWords.length + ' 词\n' +
+        '✓ 直接记得：' + quizKnown + ' 个\n' +
+        '👁 看了释义才想起：' + quizReview + ' 个';
+      quizResult.classList.remove('hidden');
+    } else {
+      renderQuiz();
+    }
+  }
+
+  function closeQuiz() {
+    quizOverlay.classList.add('hidden');
+    quizWords = null;
+  }
+
+  quizBtn.addEventListener('click', startQuiz);
+  quizClose.addEventListener('click', () => { closeQuiz(); toast('已退出检测'); });
+  quizShow.addEventListener('click', revealQuiz);
+  quizRemember.addEventListener('click', nextQuiz);
+  quizAgain.addEventListener('click', startQuiz);
+  quizDone.addEventListener('click', closeQuiz);
+  quizOverlay.addEventListener('click', (e) => { if (e.target === quizOverlay) closeQuiz(); });
+  quizSpeak.addEventListener('click', () => { const w = currentQuiz(); if (w) play(w.audioUs || w.audioUk, w.word); });
+  quizWord.addEventListener('click', () => { const w = currentQuiz(); if (w) play(w.audioUs || w.audioUk, w.word); });
+  quizPhonetic.addEventListener('click', (e) => {
+    const s = e.target.closest('[data-audio]');
+    if (s) { const w = currentQuiz(); play(s.getAttribute('data-audio'), w ? w.word : ''); }
+  });
 
   // ---------- 搜索 ----------
   filterInput.addEventListener('input', renderList);

@@ -309,3 +309,99 @@ body {
   text-align: center;
   animation: pop 0.18s ease-out;
 }
+
+/* ---------- 排序 + 检测入口工具栏 ---------- */
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 14px 0 10px; }
+.seg {
+  display: inline-flex;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 3px;
+  box-shadow: var(--shadow);
+}
+.seg-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.seg-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.quiz-btn {
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 12px;
+  padding: 9px 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.1s;
+}
+.quiz-btn:active { transform: scale(0.96); }
+
+/* ---------- 单词检测 ---------- */
+.quiz-overlay {
+  align-items: stretch;
+  padding: calc(10px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(15, 18, 30, 0.72);
+}
+.quiz {
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  padding: 18px 16px;
+  animation: pop 0.2s ease-out;
+}
+.quiz-top { display: flex; align-items: center; justify-content: space-between; }
+.quiz-progress { font-size: 14px; font-weight: 700; color: var(--accent); }
+.quiz-bar { height: 6px; background: #eef0f6; border-radius: 99px; margin: 10px 0 4px; overflow: hidden; }
+#quizBarFill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; transition: width 0.3s; }
+.quiz-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 26px 6px 18px; }
+.quiz-word { font-size: 38px; font-weight: 800; word-break: break-all; text-align: center; cursor: pointer; }
+.quiz-phonetic { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.quiz-phonetic .ph-line { font-size: 16px; padding: 6px 14px; }
+.quiz-speak {
+  margin-top: 14px;
+  border: none;
+  background: #eef2ff;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 99px;
+  cursor: pointer;
+}
+.quiz-defs { margin-top: 18px; width: 100%; }
+.quiz-defs .def-line {
+  font-size: 15.5px;
+  color: #1f2430;
+  padding: 5px 0 5px 18px;
+  position: relative;
+}
+.quiz-defs .def-line::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 13px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+.quiz-defs .def-line.en { color: #6b7280; font-size: 13px; }
+.quiz-actions { display: flex; gap: 10px; }
+.quiz-actions .btn { flex: 1; padding: 13px 10px; font-size: 16px; }
+
+/* 结果 */
+.quiz-result { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 34px 10px; }
+.quiz-result-icon { font-size: 52px; }
+.quiz-result-title { font-size: 20px; margin: 12px 0 6px; }
+.quiz-result-text { font-size: 15px; color: var(--text-2); text-align: center; line-height: 1.7; white-space: pre-line; }
+.quiz-result-actions { display: flex; gap: 10px; margin-top: 20px; width: 100%; }
+.quiz-result-actions .btn { flex: 1; }
